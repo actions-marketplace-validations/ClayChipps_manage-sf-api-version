@@ -1,11 +1,10 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Clay Chipps'
+description: 'Upgrade SFDX API Version'
+author: 'Clay Chipps'
 inputs:
-  milliseconds: # change this
+  api-version:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'api version in the format XX e.g 58'
 runs:
   using: 'node16'
   main: 'dist/index.js'
