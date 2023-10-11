@@ -1,10 +1,10 @@
 name: 'Clay Chipps'
-description: 'Upgrade SFDX API Version'
+description: 'Manage SF API Version'
 author: 'Clay Chipps'
 inputs:
   api-version:
     required: true
     description: 'api version in the format XX e.g 58'
 runs:
-  using: 'node16'
+  using: 'node18'
   main: 'dist/index.js'
