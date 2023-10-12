@@ -9,7 +9,7 @@ A GitHub action that will automatically find all API version references in a giv
 ### Example
 
 ```yml
-name: Upgrade API Versions
+name: Manage SF API Version
 on:
   workflow_dispatch:
     inputs:
@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Upgrade API Version
-        uses: ctchipps/upgrade-sfdx-api-version@v1
+      - name: Manage SF API Version
+        uses: ClayChipps/manage-sf-api-version@v1
         with:
           api-version: ${{inputs.api-version}}
       - name: Create Pull Request
