@@ -74,7 +74,7 @@ function run() {
                         else if (xmlJson.AuraDefinitionBundle) {
                             xmlJson.AuraDefinitionBundle.apiVersion = `${apiVersion}.0`;
                         }
-                        fs.writeFile(filepath, new xml2js.Builder().buildObject(xmlJson), (writeError) => {
+                        fs.writeFile(filepath, new xml2js.Builder().buildObject(xmlJson), writeError => {
                             if (writeError) {
                                 throw new Error(writeError === null || writeError === void 0 ? void 0 : writeError.message);
                             }
