@@ -50,7 +50,6 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const glob = __importStar(__nccwpck_require__(8090));
 const fs_1 = __nccwpck_require__(7147);
-const path = __importStar(__nccwpck_require__(1017));
 const xml2js = __importStar(__nccwpck_require__(6189));
 /**
  * The main function for the action.
@@ -68,12 +67,11 @@ function run() {
                     _c = _j.value;
                     _g = false;
                     const projectJsonFile = _c;
-                    const filepath = path.normalize(path.join(process.cwd(), projectJsonFile));
-                    core.debug(`Found sfdx-project.json at ${filepath}`);
+                    core.debug(`Found sfdx-project.json at ${projectJsonFile}`);
                     const fileData = yield fs_1.promises.readFile(projectJsonFile, 'utf-8');
                     const projectJson = JSON.parse(fileData);
                     projectJson.sourceApiVersion = `${apiVersion}.0`;
-                    yield fs_1.promises.writeFile(filepath, JSON.stringify(projectJson, null, 2));
+                    yield fs_1.promises.writeFile(projectJsonFile, JSON.stringify(projectJson, null, 2));
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -90,8 +88,7 @@ function run() {
                     _f = _m.value;
                     _k = false;
                     const metadataXmlFile = _f;
-                    const filepath = path.normalize(path.join(process.cwd(), metadataXmlFile));
-                    core.debug(`Found meta.xml at ${filepath}`);
+                    core.debug(`Found meta.xml at ${metadataXmlFile}`);
                     const fileData = yield fs_1.promises.readFile(metadataXmlFile);
                     const xmlJson = yield xml2js.parseStringPromise(fileData);
                     if (xmlJson.ApexClass) {
@@ -103,7 +100,7 @@ function run() {
                     else if (xmlJson.AuraDefinitionBundle) {
                         xmlJson.AuraDefinitionBundle.apiVersion = `${apiVersion}.0`;
                     }
-                    yield fs_1.promises.writeFile(filepath, new xml2js.Builder().buildObject(xmlJson));
+                    yield fs_1.promises.writeFile(metadataXmlFile, new xml2js.Builder().buildObject(xmlJson));
                 }
             }
             catch (e_2_1) { e_2 = { error: e_2_1 }; }

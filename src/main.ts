@@ -44,7 +44,10 @@ export async function run(): Promise<void> {
         xmlJson.AuraDefinitionBundle.apiVersion = `${apiVersion}.0`
       }
 
-      await fs.writeFile(metadataXmlFile, new xml2js.Builder().buildObject(xmlJson))
+      await fs.writeFile(
+        metadataXmlFile,
+        new xml2js.Builder().buildObject(xmlJson)
+      )
     }
   } catch (error) {
     if (error instanceof Error) {
