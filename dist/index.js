@@ -53,9 +53,11 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const apiVersion = core.getInput('api-version');
+            core.debug(`Rewriting sfdx-project.json...`);
             const projectJsonFiles = (0, glob_1.globSync)('./**/sfdx-project.json');
             for (const projectJsonFile of projectJsonFiles) {
                 const filepath = path.normalize(path.join(process.cwd(), projectJsonFile));
+                core.debug(`Found sfdx-project.json at ${filepath}`);
                 fs.readFile(projectJsonFile, 'utf-8', (readError, data) => {
                     if (readError) {
                         throw new Error(readError === null || readError === void 0 ? void 0 : readError.message);
@@ -69,9 +71,11 @@ function run() {
                     });
                 });
             }
+            core.debug(`Rewriting meta.xml...`);
             const metadataXmlFiles = (0, glob_1.globSync)('./**/*-meta.xml');
             for (const metadataXmlFile of metadataXmlFiles) {
                 const filepath = path.normalize(path.join(process.cwd(), metadataXmlFile));
+                core.debug(`Found meta.xml at ${filepath}`);
                 fs.readFile(metadataXmlFile, (readError, data) => {
                     if (readError) {
                         throw new Error(readError === null || readError === void 0 ? void 0 : readError.message);
