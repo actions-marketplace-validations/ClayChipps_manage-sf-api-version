@@ -12,6 +12,30 @@ export async function run(): Promise<void> {
   try {
     const apiVersion = core.getInput('api-version')
 
+    const projectJsonFiles = globSync('./**/sfdx-project.json')
+
+    for (const projectJsonFile of projectJsonFiles) {
+      const filepath = path.normalize(path.join(process.cwd(), projectJsonFile))
+      fs.readFile(projectJsonFile, 'utf-8', (readError, data) => {
+        if (readError) {
+          throw new Error(readError?.message)
+        }
+
+        const projectJson = JSON.parse(data)
+        projectJson.sourceApiVersion = `${apiVersion}.0`
+
+        fs.writeFile(
+          filepath,
+          JSON.stringify(projectJson, null, 2),
+          writeError => {
+            if (writeError) {
+              throw new Error(writeError?.message)
+            }
+          }
+        )
+      })
+    }
+
     const metadataXmlFiles = globSync('./**/*-meta.xml')
 
     for (const metadataXmlFile of metadataXmlFiles) {

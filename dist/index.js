@@ -53,6 +53,22 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const apiVersion = core.getInput('api-version');
+            const projectJsonFiles = (0, glob_1.globSync)('./**/sfdx-project.json');
+            for (const projectJsonFile of projectJsonFiles) {
+                const filepath = path.normalize(path.join(process.cwd(), projectJsonFile));
+                fs.readFile(projectJsonFile, 'utf-8', (readError, data) => {
+                    if (readError) {
+                        throw new Error(readError === null || readError === void 0 ? void 0 : readError.message);
+                    }
+                    const projectJson = JSON.parse(data);
+                    projectJson.sourceApiVersion = `${apiVersion}.0`;
+                    fs.writeFile(filepath, JSON.stringify(projectJson, null, 2), writeError => {
+                        if (writeError) {
+                            throw new Error(writeError === null || writeError === void 0 ? void 0 : writeError.message);
+                        }
+                    });
+                });
+            }
             const metadataXmlFiles = (0, glob_1.globSync)('./**/*-meta.xml');
             for (const metadataXmlFile of metadataXmlFiles) {
                 const filepath = path.normalize(path.join(process.cwd(), metadataXmlFile));
