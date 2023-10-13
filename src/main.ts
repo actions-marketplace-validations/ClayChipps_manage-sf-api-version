@@ -16,7 +16,7 @@ export async function run(): Promise<void> {
     const projectJsonGlobber = await glob.create('**/sfdx-project.json')
 
     for await (const projectJsonFile of projectJsonGlobber.globGenerator()) {
-      const filepath = path.normalize(path.join(process.cwd(), projectJsonFile))
+      const filepath = path.normalize(projectJsonFile)
 
       core.debug(`Found sfdx-project.json at ${filepath}`)
 
@@ -33,7 +33,7 @@ export async function run(): Promise<void> {
     const metadataXmlGlobber = await glob.create('./**/*-meta.xml')
 
     for await (const metadataXmlFile of metadataXmlGlobber.globGenerator()) {
-      const filepath = path.normalize(path.join(process.cwd(), metadataXmlFile))
+      const filepath = path.normalize(metadataXmlFile)
 
       core.debug(`Found meta.xml at ${filepath}`)
 
