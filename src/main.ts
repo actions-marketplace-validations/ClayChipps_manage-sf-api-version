@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import {promises as fs} from 'fs'
-import * as path from 'path'
 import * as xml2js from 'xml2js'
 
 /**
@@ -16,16 +15,14 @@ export async function run(): Promise<void> {
     const projectJsonGlobber = await glob.create('**/sfdx-project.json')
 
     for await (const projectJsonFile of projectJsonGlobber.globGenerator()) {
-      const filepath = path.normalize(projectJsonFile)
-
-      core.debug(`Found sfdx-project.json at ${filepath}`)
+      core.debug(`Found sfdx-project.json at ${projectJsonFile}`)
 
       const fileData = await fs.readFile(projectJsonFile, 'utf-8')
 
       const projectJson = JSON.parse(fileData)
       projectJson.sourceApiVersion = `${apiVersion}.0`
 
-      await fs.writeFile(filepath, JSON.stringify(projectJson, null, 2))
+      await fs.writeFile(projectJsonFile, JSON.stringify(projectJson, null, 2))
     }
 
     core.debug(`Rewriting meta.xml...`)
@@ -33,9 +30,7 @@ export async function run(): Promise<void> {
     const metadataXmlGlobber = await glob.create('./**/*-meta.xml')
 
     for await (const metadataXmlFile of metadataXmlGlobber.globGenerator()) {
-      const filepath = path.normalize(metadataXmlFile)
-
-      core.debug(`Found meta.xml at ${filepath}`)
+      core.debug(`Found meta.xml at ${metadataXmlFile}`)
 
       const fileData = await fs.readFile(metadataXmlFile)
 
@@ -49,7 +44,7 @@ export async function run(): Promise<void> {
         xmlJson.AuraDefinitionBundle.apiVersion = `${apiVersion}.0`
       }
 
-      await fs.writeFile(filepath, new xml2js.Builder().buildObject(xmlJson))
+      await fs.writeFile(metadataXmlFile, new xml2js.Builder().buildObject(xmlJson))
     }
   } catch (error) {
     if (error instanceof Error) {
