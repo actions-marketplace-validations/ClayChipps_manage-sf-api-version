@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
-import * as fs from 'fs'
+import * as glob from '@actions/glob'
+import {promises as fs} from 'fs'
 import * as path from 'path'
-import {globSync} from 'glob'
 import * as xml2js from 'xml2js'
 
 /**
@@ -13,73 +13,43 @@ export async function run(): Promise<void> {
     const apiVersion = core.getInput('api-version')
 
     core.debug(`Rewriting sfdx-project.json...`)
+    const projectJsonGlobber = await glob.create('**/sfdx-project.json')
 
-    const projectJsonFiles = globSync('./**/sfdx-project.json')
-
-    for (const projectJsonFile of projectJsonFiles) {
+    for await (const projectJsonFile of projectJsonGlobber.globGenerator()) {
       const filepath = path.normalize(path.join(process.cwd(), projectJsonFile))
 
       core.debug(`Found sfdx-project.json at ${filepath}`)
 
-      fs.readFile(projectJsonFile, 'utf-8', (readError, data) => {
-        if (readError) {
-          throw new Error(readError?.message)
-        }
+      const fileData = await fs.readFile(projectJsonFile, 'utf-8')
 
-        const projectJson = JSON.parse(data)
-        projectJson.sourceApiVersion = `${apiVersion}.0`
+      const projectJson = JSON.parse(fileData)
+      projectJson.sourceApiVersion = `${apiVersion}.0`
 
-        fs.writeFile(
-          filepath,
-          JSON.stringify(projectJson, null, 2),
-          writeError => {
-            if (writeError) {
-              throw new Error(writeError?.message)
-            }
-          }
-        )
-      })
+      await fs.writeFile(filepath, JSON.stringify(projectJson, null, 2))
     }
 
     core.debug(`Rewriting meta.xml...`)
 
-    const metadataXmlFiles = globSync('./**/*-meta.xml')
+    const metadataXmlGlobber = await glob.create('./**/*-meta.xml')
 
-    for (const metadataXmlFile of metadataXmlFiles) {
+    for await (const metadataXmlFile of metadataXmlGlobber.globGenerator()) {
       const filepath = path.normalize(path.join(process.cwd(), metadataXmlFile))
 
       core.debug(`Found meta.xml at ${filepath}`)
 
-      fs.readFile(metadataXmlFile, (readError, data) => {
-        if (readError) {
-          throw new Error(readError?.message)
-        }
+      const fileData = await fs.readFile(metadataXmlFile)
 
-        const parser = new xml2js.Parser({explicitArray: false})
-        parser.parseString(data, (parseError, xmlJson) => {
-          if (parseError) {
-            throw new Error(parseError?.message)
-          }
+      const xmlJson = await xml2js.parseStringPromise(fileData)
 
-          if (xmlJson.ApexClass) {
-            xmlJson.ApexClass.apiVersion = `${apiVersion}.0`
-          } else if (xmlJson.LightningComponentBundle) {
-            xmlJson.LightningComponentBundle.apiVersion = `${apiVersion}.0`
-          } else if (xmlJson.AuraDefinitionBundle) {
-            xmlJson.AuraDefinitionBundle.apiVersion = `${apiVersion}.0`
-          }
+      if (xmlJson.ApexClass) {
+        xmlJson.ApexClass.apiVersion = `${apiVersion}.0`
+      } else if (xmlJson.LightningComponentBundle) {
+        xmlJson.LightningComponentBundle.apiVersion = `${apiVersion}.0`
+      } else if (xmlJson.AuraDefinitionBundle) {
+        xmlJson.AuraDefinitionBundle.apiVersion = `${apiVersion}.0`
+      }
 
-          fs.writeFile(
-            filepath,
-            new xml2js.Builder().buildObject(xmlJson),
-            writeError => {
-              if (writeError) {
-                throw new Error(writeError?.message)
-              }
-            }
-          )
-        })
-      })
+      await fs.writeFile(filepath, new xml2js.Builder().buildObject(xmlJson))
     }
   } catch (error) {
     if (error instanceof Error) {
