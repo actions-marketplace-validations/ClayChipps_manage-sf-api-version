@@ -70,7 +70,7 @@ function run() {
                     const projectJsonFile = _c;
                     const filepath = path.normalize(path.join(process.cwd(), projectJsonFile));
                     core.debug(`Found sfdx-project.json at ${filepath}`);
-                    const fileData = yield fs_1.promises.readFile(projectJsonFile, "utf-8");
+                    const fileData = yield fs_1.promises.readFile(projectJsonFile, 'utf-8');
                     const projectJson = JSON.parse(fileData);
                     projectJson.sourceApiVersion = `${apiVersion}.0`;
                     yield fs_1.promises.writeFile(filepath, JSON.stringify(projectJson, null, 2));
@@ -122,6 +122,7 @@ function run() {
     });
 }
 exports.run = run;
+run();
 
 
 /***/ }),
