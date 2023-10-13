@@ -12,10 +12,15 @@ export async function run(): Promise<void> {
   try {
     const apiVersion = core.getInput('api-version')
 
+    core.debug(`Rewriting sfdx-project.json...`)
+
     const projectJsonFiles = globSync('./**/sfdx-project.json')
 
     for (const projectJsonFile of projectJsonFiles) {
       const filepath = path.normalize(path.join(process.cwd(), projectJsonFile))
+
+      core.debug(`Found sfdx-project.json at ${filepath}`)
+
       fs.readFile(projectJsonFile, 'utf-8', (readError, data) => {
         if (readError) {
           throw new Error(readError?.message)
@@ -36,10 +41,15 @@ export async function run(): Promise<void> {
       })
     }
 
+    core.debug(`Rewriting meta.xml...`)
+
     const metadataXmlFiles = globSync('./**/*-meta.xml')
 
     for (const metadataXmlFile of metadataXmlFiles) {
       const filepath = path.normalize(path.join(process.cwd(), metadataXmlFile))
+
+      core.debug(`Found meta.xml at ${filepath}`)
+
       fs.readFile(metadataXmlFile, (readError, data) => {
         if (readError) {
           throw new Error(readError?.message)
